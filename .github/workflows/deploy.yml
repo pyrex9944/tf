@@ -2,8 +2,7 @@ name: learn-github-actions
 on: [push]
 jobs:
   check-bats-version:
-    runs-on: 
-      group: ubuntu-runners
+    runs-on: [self-hosted, linux, ARM64]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
