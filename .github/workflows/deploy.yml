@@ -1,12 +1,30 @@
-name: learn-github-actions
+name: CI-New
 on: [push]
+
+env:
+  NX_BRANCH: ${{ github.head_ref }}
+  NX_RUN_GROUP: ${{ github.run_id }}
+
 jobs:
-  check-bats-version:
+  build_and_test:
     runs-on: self-hosted
+    environment: Staging
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
       - uses: actions/setup-node@v3
         with:
-          node-version: '14'
-      - run: npm install -g bats
-      - run: bats -v
+          node-version: '16'
+          cache: 'npm'
+      - name: Restore NX Cache
+        id: nx-cache
+        uses: actions/cache@v3
+        env:
+          cache-name: nx-cache
+        with:
+          path: node_modules/.cache/nx
+          key: permanent
+      - run: npm i
+      - run: ng serve
