@@ -1,0 +1,17 @@
+scalar DateTime
+
+enum Permissions {
+  GRANT_REVOKE_MANAGER
+}
+
+union BookUnionResult = Status | Error
+
+type Error {
+  message: String!
+}
+
+type Query {
+  welcome: String!
+}
+
+type Mutation

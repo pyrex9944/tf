@@ -1,0 +1,25 @@
+type Status {
+  id: ID!
+  material_id: Int!
+  person_id: Int!
+  status: String!
+  created_at: DateTime!
+  material: Material!
+  person: Person!
+}
+
+input CreateStatusInput {
+  material_id: Int!
+  person_id: Int!
+  status: String!
+}
+
+extend type Query {
+  getStatusesByPerson(person_id: ID!): [Status]!
+  getStatusesByMaterial(material_id: ID!): [Status]!
+  getAllStatusesIsOverdue(locations: [Int!]): [Status]!
+}
+
+extend type Mutation {
+  createStatus(input: CreateStatusInput!): Status!
+}

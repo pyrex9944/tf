@@ -1,0 +1,134 @@
+type Material {
+  id: ID!
+  identifier: String!
+  id_type: String!
+  type: String!
+  location_id: Int!
+  created_at: DateTime!
+  updated_at: DateTime!
+  title: String!
+  picture: String
+  author: String!
+  category: String!
+  location: Location!
+  statuses: [Status]!
+  notifications: [Notification]!
+  messages: [Message]!
+  description: String!
+  is_donated: Boolean!
+}
+
+input CreateMaterialInput {
+  identifier: String!
+  id_type: String!
+  location_id: Int!
+  type: String!
+  title: String!
+  picture: String
+  author: String!
+  category: String!
+  description: String!
+}
+
+input RemoveMaterialInput {
+  identifier: String!
+  location_id: Int!
+  type: String!
+}
+
+input UpdateMaterialInput {
+  identifier: String
+  id_type: String
+  location_id: Int
+  type: String
+  title: String
+  picture: String
+  author: String
+  category: String
+  updated_at: DateTime!
+  description: String
+}
+
+input SearchOneMaterial {
+  identifier: String!
+  locations: [Int!]
+}
+
+input DonateBookInput {
+  identifier: String!
+  id_type: String!
+  location_id: Int!
+  type: String!
+  title: String!
+  author: String!
+  category: String!
+  description: String
+  picture: String
+  person_id: Int!
+  role: String!
+  is_donated: Boolean!
+}
+
+input SearchInput {
+  search: String
+  locations: [Int!]
+}
+
+type ResponseMetadata {
+  idType: String!
+  value: String!
+}
+
+type Author {
+  id: ID
+  name: String
+}
+
+type Publisher {
+  id: ID
+  name: String
+}
+
+type Meta {
+  ageRestriction: String
+  coverType: String
+  dimensions: String
+  manufacturer: String
+  mass: String
+  numberOfPages: String
+  price: String
+  series: String
+  sku: String
+}
+
+type IMaterialMeta {
+  authors: [Author]
+  cover: String
+  description: String
+  title: String
+  yearPublishedAt: Int
+  meta: Meta
+  publisher: Publisher
+}
+
+type IMetaOfMaterial {
+  idType: String
+  value: String
+  material: IMaterialMeta
+}
+
+extend type Query {
+  getAllMaterials(locations: [Int!], limit: Int, offset: Int): [Material]!
+  getMaterialById(id: ID!): Material!
+  searchOfMaterials(input: SearchInput!): [Material]
+  getMaterialByIdentifier(input: SearchOneMaterial!): Material!
+  getMaterialByIdentifierFromMetadata(identifier: String!): IMetaOfMaterial
+  getAllDonatedMaterialsByPerson(id: ID!): [Material]
+}
+
+extend type Mutation {
+  createMaterial(input: CreateMaterialInput!): Material!
+  removeMaterial(input: RemoveMaterialInput!): Material!
+  updateMaterial(input: UpdateMaterialInput!): Material!
+  donateBook(input: DonateBookInput!): Material!
+}

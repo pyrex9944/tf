@@ -1,0 +1,11 @@
+query GetMaterialByIdentifier($identifier: String!, $locations: [Int!]) {
+  getMaterialByIdentifier(
+    input: { identifier: $identifier, locations: $locations }
+  ) {
+    id
+    picture
+    author
+    title
+    category
+  }
+}

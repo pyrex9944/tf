@@ -1,0 +1,15 @@
+query GetAllStatusesIsOverdue($locations: [Int!]) {
+  getAllStatusesIsOverdue(locations: $locations) {
+    id
+    created_at
+    material {
+      id
+      title
+    }
+    person {
+      id
+      username
+      avatar
+    }
+  }
+}

@@ -1,0 +1,35 @@
+mutation DonateBook(
+  $person_id: Int!
+  $location_id: Int!
+  $identifier: String!
+  $id_type: String!
+  $type: String!
+  $title: String!
+  $author: String!
+  $category: String!
+  $description: String
+  $picture: String
+  $role: String!
+  $is_donated: Boolean!
+) {
+  donateBook(
+    input: {
+      person_id: $person_id
+      location_id: $location_id
+      identifier: $identifier
+      type: $type
+      author: $author
+      category: $category
+      description: $description
+      id_type: $id_type
+      picture: $picture
+      title: $title
+      role: $role
+      is_donated: $is_donated
+    }
+  ) {
+    title
+    picture
+    identifier
+  }
+}

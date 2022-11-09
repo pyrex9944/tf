@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("METADATA_DB_URL")
+}
+
+enum IdentifierType {
+  ISBN_10 @map("ISBN-10")
+  ISBN_13 @map("ISBN-13")
+}
+
+model Identifier {
+  id         Int            @id @default(autoincrement())
+  value      String         @unique
+  idType     IdentifierType
+  hits       Int            @default(1)
+  meta       Json
+  materialId Int?
+  material   Material?      @relation(fields: [materialId], references: [id])
+  jobId      Int?           @unique
+  job        Job?           @relation(fields: [jobId], references: [id])
+}
+
+model Author {
+  id          Int        @id @default(autoincrement())
+  name        String
+  referenceId String
+  meta        Json
+  materials   Material[]
+
+  @@unique([name, referenceId])
+  @@index([referenceId])
+  @@index([name])
+}
+
+model Publisher {
+  id          Int        @id @default(autoincrement())
+  name        String
+  referenceId String
+  meta        Json
+  mateials    Material[]
+
+  @@unique([name, referenceId])
+  @@index([name])
+  @@index([referenceId])
+}
+
+model Material {
+  id               Int          @id @default(autoincrement())
+  title            String
+  description      String
+  yearPublishedAt  Int          @db.SmallInt
+  monthPublishedAt Int          @db.SmallInt
+  cover            String
+  meta             Json
+  publisherId      Int?
+  publisher        Publisher?   @relation(fields: [publisherId], references: [id])
+  identifiers      Identifier[]
+  authors          Author[]
+
+  @@index([title])
+}
+
+enum JobStatus {
+  PENDING
+  FOUND
+  MISS
+}
+
+model Job {
+  id         Int         @id @default(autoincrement())
+  startedAt  DateTime
+  finishedAt DateTime
+  status     JobStatus   @default(PENDING)
+  meta       Json
+  identifier Identifier?
+}

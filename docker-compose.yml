@@ -1,0 +1,50 @@
+version: '3.9'
+services:
+  db:
+    image: postgres
+    env_file: .env
+    volumes:
+      - db:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_ROOT_PASSWORD}
+
+  websrv:
+    image: nginx:latest
+    ports:
+      - '80:80'
+      - '443:443'
+    restart: always
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    volumes:
+      - ./nginx/conf:/etc/nginx/conf.d/:ro
+      - ./certbot/www:/var/www/certbot/:ro
+      - ./certbot/conf/:/etc/letsencrypt/:ro
+      - /srv/www:/usr/share/nginx/html:ro
+
+  # Obtain certificate
+  websrv-certbot:
+    image: nginx:latest
+    ports:
+      - '80:80'
+    restart: always
+    volumes:
+      - ./nginx/conf-certbot:/etc/nginx/conf.d/:ro
+      - ./certbot/www:/var/www/certbot/:ro
+      - ./certbot/conf/:/etc/letsencrypt/:ro
+
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - ./certbot/www:/var/www/certbot/:rw
+      - ./certbot/conf/:/etc/letsencrypt/:rw
+    tty: true
+    stdin_open: true
+    command: certonly
+
+volumes:
+  db:

@@ -1,0 +1,39 @@
+type Person {
+  id: ID!
+  smg_id: String!
+  position: String!
+  type: String!
+  username: String!
+  email: String!
+  avatar: String!
+  created_at: DateTime!
+  permissions: [Permissions]
+  statuses: [Status]
+  notifications: [Notification]
+  location: [Location!]
+  messages: [Message]
+  states: [BlockedUsers]
+}
+
+input CreatePersonInput {
+  smg_id: String!
+  location_id: Int!
+  type: String!
+}
+
+input UpdatePersonLocationInput {
+  person_id: Int!
+  location_id: Int!
+}
+
+extend type Query {
+  getOnePerson(id: ID!): Person!
+  getAllPersons(username: String, locations: [Int!]): [Person!]!
+}
+
+extend type Mutation {
+  createPerson(input: CreatePersonInput!): Person!
+  addPersonLocation(input: UpdatePersonLocationInput!): Person!
+  removePersonLocation(input: UpdatePersonLocationInput!): Person!
+  changePersonRole(person_id: Int!, type: String!): Person!
+}

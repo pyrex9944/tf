@@ -1,0 +1,21 @@
+input BookInput {
+  identifier: String!
+  person_id: Int!
+}
+
+input ProlongTimeInput {
+  person_id: Int!
+  material_id: Int!
+}
+
+extend type Query {
+  getAllTakenItems(person_id: Int!): [Status]!
+  getItemsForClaimHistory(person_id: Int!): [Status]!
+}
+
+extend type Mutation {
+  claimBook(input: BookInput): BookUnionResult!
+  returnItem(input: BookInput): BookUnionResult!
+  rejectItem(input: BookInput): BookUnionResult!
+  prolongClaimPeriod(input: ProlongTimeInput): BookUnionResult!
+}

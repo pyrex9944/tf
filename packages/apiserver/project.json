@@ -1,0 +1,75 @@
+{
+  "sourceRoot": "packages/apiserver/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/node:webpack",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/packages/apiserver",
+        "main": "packages/apiserver/src/main.ts",
+        "tsConfig": "packages/apiserver/tsconfig.app.json",
+        "assets": [
+          "packages/apiserver/src/assets",
+          "packages/apiserver/src/migrations",
+          "packages/apiserver/src/ormconfig.ts",
+          {
+            "glob": "**/*.graphql",
+            "input": "packages/apiserver",
+            "output": "gql"
+          }
+        ]
+      },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "extractLicenses": true,
+          "generatePackageJson": true,
+          "inspect": false,
+          "fileReplacements": [
+            {
+              "replace": "packages/apiserver/src/environments/environment.ts",
+              "with": "packages/apiserver/src/environments/environment.prod.ts"
+            }
+          ]
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nrwl/node:node",
+      "options": {
+        "buildTarget": "apiserver:build"
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["packages/apiserver/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/packages/apiserver"],
+      "options": {
+        "jestConfig": "packages/apiserver/jest.config.js",
+        "passWithNoTests": true
+      }
+    },
+    "deploy": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
+      "options": {},
+      "configurations": {
+        "production": {
+          "commands": [
+            "cp package-lock.json dist/packages/apiserver",
+            "rsync -azvr --exclude=node_modules/ --delete --chown=app:app dist/packages/apiserver/ root@mimirapp.xyz:/srv/apiserver"
+          ],
+          "parallel": false
+        }
+      }
+    }
+  },
+  "tags": []
+}

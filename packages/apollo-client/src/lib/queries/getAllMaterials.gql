@@ -1,0 +1,24 @@
+query GetAllMaterials($locations: [Int!], $limit: Int, $offset: Int) {
+  getAllMaterials(locations: $locations, limit: $limit, offset: $offset) {
+    author
+    category
+    created_at
+    id
+    id_type
+    identifier
+    description
+    is_donated
+    notifications {
+      material_id
+      person_id
+    }
+    picture
+    statuses {
+      status
+      person_id
+    }
+    title
+    type
+    updated_at
+  }
+}

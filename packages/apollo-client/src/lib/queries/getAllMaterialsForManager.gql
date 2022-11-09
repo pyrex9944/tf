@@ -1,0 +1,17 @@
+query GetAllMaterialsForManager($locations: [Int!], $limit: Int, $offset: Int) {
+  getAllMaterials(locations: $locations, limit: $limit, offset: $offset) {
+    id
+    title
+    category
+    picture
+    statuses {
+      id
+      created_at
+      status
+      person {
+        id
+        username
+      }
+    }
+  }
+}
