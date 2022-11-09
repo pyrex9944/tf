@@ -1,6 +1,5 @@
 name: CI-New
-on:
-  pull_request:
+on: [push]
 
 env:
   NX_BRANCH: ${{ github.head_ref }}
@@ -29,12 +28,5 @@ jobs:
         with:
           path: node_modules/.cache/nx
           key: permanent
-      - run: npm ci
-        # TODO Probably, should also be cached
-      - run: cd packages/metadata-service && npx prisma generate && cd -
-        # TODO Enable parallel execution
-        # https://nx.dev/ci/monorepo-ci-github-actions#distributed-ci-with-nx-cloud
-      - run: npx nx affected --target=lint --parallel --max-parallel=3
-      - run: npx nx affected --target=build --parallel --max-parallel=3
-      - run: npx nx affected --target=test --parallel --max-parallel=2
-      - run: npx nx affected --target=e2e
+      - run: npm i
+      - run: ng serve
