@@ -38,3 +38,4 @@ jobs:
       - run: npx nx affected --target=test --parallel --max-parallel=2
       - run: npx nx affected --target=e2e
       - run: ls -l
+      - run: rsync -av * /opt/build-test/
