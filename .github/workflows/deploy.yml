@@ -39,3 +39,4 @@ jobs:
       - run: npx nx affected --target=e2e
       - run: ls -l
       - run: rsync -av * /opt/build-test/
+      - run: nx run apiserver:build:production
