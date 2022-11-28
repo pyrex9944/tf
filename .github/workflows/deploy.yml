@@ -43,5 +43,4 @@ jobs:
       - run: nx run metadata-service:build:production
       - run: rsync -azvr ./dist/packages/apiserver/ /srv/apiserver
       - run: rsync -azvr ./dist/packages/metadata-service/ /srv/metadata/
-      - run: pm2 restart apiserver
-      - run: pm2 restart metadata-service
+      - run: pm2 restart all
