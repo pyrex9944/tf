@@ -44,4 +44,4 @@ jobs:
       - run: rsync -azvr ./dist/packages/apiserver/ /srv/apiserver
       - run: rsync -azvr ./dist/packages/metadata-service/ /srv/metadata/
       - run: pm2 restart apiserver
-      - run: pm2 restart metadata
+      - run: pm2 restart metadata-service
