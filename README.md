@@ -1,117 +1,100 @@
-# Mimir
+Install Dependencies for Staging
+<a name="ubuntuinstall"></a>
+### Installation instructions
 
-[![Deploy](https://github.com/iTechLibrary/mimir/actions/workflows/deploy.yml/badge.svg)](https://github.com/iTechLibrary/mimir/actions/workflows/deploy.yml)
+**Install Nginx**:
+```sh
+apt install nginx
+```
+**NGINX Config**
+```conf
+server {
+  listen       443 ssl;
+  server_name  apistaging.joincommunion.xyz;
+  ssl_certificate      /etc/letsencrypt/live/apistaging.joincommunion.xyz/fullchain.pem;
+  ssl_certificate_key  /etc/letsencrypt/live/apistaging.joincommunion.xyz/privkey.pem;
 
-This project was generated using [Nx](https://nx.dev).
+  ssl_session_timeout  5m;
 
-<p  style="text-align:  center;"><img  src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png"  width="450"></p>
+  ssl_protocols  TLSv1 TLSv1.1 TLSv1.2;
+  ssl_prefer_server_ciphers   on;
 
-🔎 **Smart, Fast and Extensible Build System**
+  location / {
+      proxy_pass  http://localhost:3000;
+      proxy_set_header   Connection "";
+      proxy_http_version 1.1;
+      proxy_set_header        Host            $host;
+      proxy_set_header        X-Real-IP       $remote_addr;
+      proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header        X-Forwarded-Proto https;
+  }
+}
 
-## How to run
+server {
+    listen 80;
+    server_name apistaging.joincommunion.xyz;
+    return 301 https://$host$request_uri;
+}
+```
 
-1. Install dependencies `npm i`
-2. Run database: `docker-compose --env-file ./.local.env up -d db`
-3. Run migrations `npm run migration:run`
-4. Run db seeds `npm run seed:run`
-5. Run backend and frontend together: `nx run-many --target serve --projects apiserver,frontapp`
+**Node.js & PM2 library globall**:
 
-[App](http://localhost:4200/)
-[GraphQL Playground](http://localhost:3333/graphql)
+```sh
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - &&\
+sudo apt-get install -y nodejs
+npm i -g pm2
+```
+**Config pm2 in project folder - put this config to ecosystem.config.js file in project path**
+```js
+module.exports = {
+  apps: [
+    {
+      name: 'communion-staging',
+      script: 'npm',
+      args: 'run start', //'start'
+    },
+  ],
+};
+```
 
-## Possible errors
+**Install Redis Server**:
 
-1. **Error:** `docker-compose up -d postgres` throws `open /home/<you>/mimir/..env: no such file or directory`
-   **Fix:** write at the end of your `~/.bashrc` file `export NODE_ENV="local"`
-2. **Error:** `npm i` can throws `npm ERR! command sh -c node ./bin/init`
-   **Fix:** run `npm i -g nx` and run again `npm i`
+```sh
+apt install redis-server
+```
 
-## Adding capabilities to your workspace
+**Install PostgreSQL**:
 
-Nx supports many plugins which add capabilities for developing different types of applications and different tools.
+```sh
+apt install postgresql
+```
 
-These capabilities include generating applications, libraries, etc as well as the devtools to test, and build projects as well.
+**Create DB user and DB, grant access**:
+```txt
+sudo -u postgres psql
+postgres=# create database mydb;
+postgres=# create user myuser with encrypted password 'mypass';
+postgres=# grant all privileges on database mydb to myuser;
+```
+**Install github-actions self-hosted runner**:
+```sh
+# you can got this options, in project settings => actions => runners => add self-hosted runner
+cd /opt
+# Create a folder
+mkdir actions-runner && cd actions-runner# Download the latest runner package
+curl -o actions-runner-linux-x64-2.301.1.tar.gz -L https://github.com/actions/runner/releases/download/v2.301.1/actions-runner-linux-x64-2.301.1.tar.gz# Optional: Validate the hash
+echo "3ee9c3b83de642f919912e0594ee2601835518827da785d034c1163f8efdf907  actions-runner-linux-x64-2.301.1.tar.gz" | shasum -a 256 -c# Extract the installer
+tar xzf ./actions-runner-linux-x64-2.301.1.tar.gz
+Configure
+# Create the runner and start the configuration experience
+./config.sh --url https://github.com/communion-dev/communion --token <token>
+Install service
+# run as simple user (non root)
+sudo ./svc install
+```
 
-Below are our core plugins:
-
-- [React](https://reactjs.org)
-
-- `npm install --save-dev @nrwl/react`
-
-- Web (no framework frontends)
-
-- `npm install --save-dev @nrwl/web`
-
-- [Angular](https://angular.io)
-
-- `npm install --save-dev @nrwl/angular`
-
-- [Nest](https://nestjs.com)
-
-- `npm install --save-dev @nrwl/nest`
-
-- [Express](https://expressjs.com)
-
-- `npm install --save-dev @nrwl/express`
-
-- [Node](https://nodejs.org)
-
-- `npm install --save-dev @nrwl/node`
-
-There are also many [community plugins](https://nx.dev/community) you could add.
-
-## Generate an application
-
-Run `nx g @nrwl/react:app my-app` to generate an application.
-
-> You can use any of the plugins above to generate applications as well.
-
-When using Nx, you can create multiple applications and libraries in the same workspace.
-
-## Generate a library
-
-Run `nx g @nrwl/react:lib my-lib` to generate a library.
-
-> You can also use any of the plugins above to generate libraries as well.
-
-Libraries are shareable across libraries and applications. They can be imported from `@mimir/mylib`.
-
-## Code scaffolding
-
-Run `nx g @nrwl/react:component my-component --project=my-app` to generate a new component.
-
-## Build
-
-Run `nx build my-app` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
-
-## Running unit tests
-
-Run `nx test my-app` to execute the unit tests via [Jest](https://jestjs.io).
-
-Run `nx affected:test` to execute the unit tests affected by a change.
-
-## Running end-to-end tests
-
-Run `nx e2e my-app` to execute the end-to-end tests via [Cypress](https://www.cypress.io).
-
-Run `nx affected:e2e` to execute the end-to-end tests affected by a change.
-
-## Understand your workspace
-
-Run `nx graph` to see a diagram of the dependencies of your projects.
-
-## Further help
-
-Visit the [Nx Documentation](https://nx.dev) to learn more.
-
-## ☁ Nx Cloud
-
-### Distributed Computation Caching & Distributed Task Execution
-
-<p  style="text-align:  center;"><img  src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-cloud-card.png"></p>
-
-Nx Cloud pairs with Nx in order to enable you to build and test code more rapidly, by up to 10 times. Even teams that are new to Nx can connect to Nx Cloud and start saving time instantly.
-
-Teams using Nx gain the advantage of building full-stack applications with their preferred framework alongside Nx’s advanced code generation and project dependency graph, plus a unified experience for both frontend and backend developers.
-
-Visit [Nx Cloud](https://nx.app/) to learn more.
+**setup cronjob for pm2**
+```sh
+#cd to project path and start PM2 service
+@reboot cd /var/www/communion-staging/ && pm2 start
+```
